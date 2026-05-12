@@ -403,8 +403,47 @@ body {
     transform: translateY(0);
     transition: transform 0.3s;
 }
+
 .modal-overlay.hidden .modal-content {
     transform: translateY(20px);
+}
+
+/* Select2 Özelleştirmeleri (Arama kutulu dropdown) */
+.select2-container .select2-selection--single {
+    height: 45px !important;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fdfdfd;
+    outline: none;
+    display: flex;
+    align-items: center;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #333;
+    line-height: normal;
+    padding-left: 0;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 43px;
+    right: 10px;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #f57f30;
+    box-shadow: 0 0 0 3px rgba(245, 127, 48, 0.1);
+}
+.select2-dropdown {
+    border-color: #f57f30;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 1050;
+}
+.select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #f57f30 !important;
+    color: white !important;
 }
 .modal-header {
     background: #fdfdfd;

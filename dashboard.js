@@ -83,13 +83,32 @@ function initDashboard() {
     populateSupplierFilter();
     populateProvinceFilter();
 
+    // Select2 Entegrasyonu (Yazarak Arama Özelliği)
+    if (window.jQuery && $.fn.select2) {
+        $('#supplierFilter').select2({
+            placeholder: "Tüm Tedarikçiler",
+            width: '100%',
+            language: "tr"
+        }).on('change', handleSupplierFilterChange);
+        
+        $('#provinceFilter').select2({
+            placeholder: "Tüm İller",
+            width: '100%',
+            language: "tr"
+        }).on('change', handleProvinceFilterChange);
+    } else {
+        // Fallback: Select2 yoksa native dinleyicileri ekle
+        document.getElementById('supplierFilter').addEventListener('change', handleSupplierFilterChange);
+        document.getElementById('provinceFilter').addEventListener('change', handleProvinceFilterChange);
+    }
+
     // Harita etkileşimlerini ayarla
     setupMapInteractions();
 
-    // Event Listener'lar
-    document.getElementById('supplierFilter').addEventListener('change', handleSupplierFilterChange);
-    document.getElementById('provinceFilter').addEventListener('change', handleProvinceFilterChange);
     document.getElementById('resetFiltersBtn').addEventListener('click', resetFilters);
+    
+    // Check initial state
+    updateMapColors();
 }
 
 function populateSupplierFilter() {
@@ -126,6 +145,11 @@ function populateProvinceFilter(selectedSupplier = "") {
         option.textContent = provName;
         select.appendChild(option);
     });
+
+    // Select2'yi güncelle
+    if (window.jQuery && $.fn.select2) {
+        $(select).trigger('change.select2');
+    }
 }
 
 function setupMapInteractions() {
@@ -174,11 +198,16 @@ function setupMapInteractions() {
             
             if (!optionExists) {
                 document.getElementById('supplierFilter').value = "";
+                if (window.jQuery && $.fn.select2) $('#supplierFilter').trigger('change.select2');
                 populateProvinceFilter("");
             }
 
             provSelect.value = normProv;
-            provSelect.dispatchEvent(new Event('change'));
+            if (window.jQuery && $.fn.select2) {
+                $(provSelect).trigger('change'); // Tetikleyerek hem arayüzü hem veriyi günceller
+            } else {
+                provSelect.dispatchEvent(new Event('change'));
+            }
         });
     });
 
@@ -393,6 +422,11 @@ function closeSupplierInfo() {
 function resetFilters() {
     document.getElementById('supplierFilter').value = "";
     document.getElementById('provinceFilter').value = "";
+    
+    if (window.jQuery && $.fn.select2) {
+        $('#supplierFilter').trigger('change.select2');
+    }
+    
     populateProvinceFilter(""); // Bütün illeri dropdown'a geri yükler
     document.getElementById('tableSection').classList.remove('active');
     updateMapColors();
