@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İkame Haritası - Eurocross Turkey</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo-container">
+            <img src="Logo.png" alt="Eurocross Turkey Logo">
+        </div>
+        <div class="header-title">
+            <i class="fa-solid fa-map-location-dot"></i> İkame Haritası
+        </div>
+        <a href="index.html" class="logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap
+        </a>
+    </header>
+
+    <main class="main-container">
+        
+        <!-- Yükleniyor Ekranı -->
+        <div id="loadingState" class="loading-data">
+            <i class="fa-solid fa-spinner spinner"></i>
+            <p>Veriler yükleniyor...</p>
+        </div>
+
+        <!-- Ana İçerik (Veri yüklendikten sonra gösterilecek) -->
+        <div id="dashboardContent" style="display: none;">
+            
+            <!-- Filtreler -->
+            <section class="filters-section">
+                <div class="filter-group">
+                    <label for="supplierFilter"><i class="fa-solid fa-building"></i> Tedarikçi Filtresi</label>
+                    <select id="supplierFilter">
+                        <option value="">Tüm Tedarikçiler</option>
+                        <!-- JS ile dolacak -->
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="provinceFilter"><i class="fa-solid fa-location-dot"></i> İl Filtresi</label>
+                    <select id="provinceFilter">
+                        <option value="">Tüm İller</option>
+                        <!-- JS ile dolacak -->
+                    </select>
+                </div>
+
+                <button id="resetFiltersBtn" class="reset-btn">
+                    <i class="fa-solid fa-rotate-right"></i> Filtreleri Sıfırla
+                </button>
+            </section>
+
+            <!-- Harita -->
+            <section class="map-section">
+                <div class="map-container" id="mapContainer">
+                    <!-- SVG Harita JS ile buraya eklenecek -->
+                </div>
+                <div class="map-labels" id="mapLabels">
+                    <!-- İl isimleri ve sayıları JS ile buraya eklenecek -->
+                </div>
+                <div id="mapTooltip" class="map-tooltip"></div>
+            </section>
+
+            <!-- Tablo -->
+            <section class="table-section" id="tableSection">
+                <div class="table-header">
+                    <h2>Öncelik Sıralaması</h2>
+                    <span class="province-badge" id="selectedProvinceBadge">İl Seçilmedi</span>
+                </div>
+                <table class="suppliers-table">
+                    <thead>
+                        <tr>
+                            <th width="10%">Sıra</th>
+                            <th width="10%">Bilgi</th>
+                            <th>Tedarikçi Adı</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suppliersTableBody">
+                        <!-- JS ile dolacak -->
+                    </tbody>
+                </table>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Tedarikçi Detay Pop-up Modalı -->
+    <div id="supplierModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tedarikçi Bilgileri</h3>
+                <button class="close-btn" onclick="closeSupplierInfo()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- İçerik JS ile dolacak -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-ok-btn" onclick="closeSupplierInfo()">Tamam</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="map-svg.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

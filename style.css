@@ -64,8 +64,8 @@ body {
 }
 
 .turkey-icon {
-    width: 30px;
-    height: 15px;
+    width: 45px;
+    height: auto;
 }
 
 .login-form {
@@ -142,18 +142,62 @@ body {
     background-color: #e06c25;
 }
 
-.help-link {
-    margin-top: 25px;
+.error-message {
+    color: #e53e3e;
+    font-size: 13px;
     text-align: center;
+    margin-top: 10px;
+    min-height: 20px;
 }
 
-.help-link a {
-    color: #a0aec0;
-    text-decoration: none;
-    font-size: 12px;
-    transition: color 0.3s ease;
+.hidden {
+    display: none !important;
 }
 
-.help-link a:hover {
-    color: var(--text-gray);
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.95);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.car-gif {
+    position: absolute;
+    width: 250px;
+    height: auto;
+    left: -250px; /* Start offscreen */
+    animation: driveCar 5s linear forwards;
+}
+
+@keyframes driveCar {
+    0% {
+        left: -250px;
+    }
+    100% {
+        left: 100vw;
+    }
+}
+
+.loading-text {
+    margin-top: 150px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-orange);
+    opacity: 0;
+    animation: fadeInText 1s forwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes fadeInText {
+    to {
+        opacity: 1;
+    }
 }

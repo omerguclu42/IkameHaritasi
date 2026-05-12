@@ -1,0 +1,472 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #f4f6f9;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header {
+    background-color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-container img {
+    height: 40px;
+    object-fit: contain;
+}
+
+.header-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f57f30;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logout-btn {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: #555;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logout-btn:hover {
+    background-color: #fcece3;
+    border-color: #f57f30;
+    color: #f57f30;
+}
+
+.main-container {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1800px; /* 1400px'den 1800px'e çıkarıldı ki harita iyice yayılabilsin */
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Filters Section */
+.filters-section {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 250px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.filter-group select {
+    padding: 0.8rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fdfdfd;
+    outline: none;
+    transition: border-color 0.2s;
+    cursor: pointer;
+}
+
+.filter-group select:focus {
+    border-color: #f57f30;
+    box-shadow: 0 0 0 3px rgba(245, 127, 48, 0.1);
+}
+
+.reset-btn {
+    padding: 0.8rem 1.5rem;
+    background-color: #f5f5f5;
+    color: #555;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 45px;
+}
+
+.reset-btn:hover {
+    background-color: #ebebeb;
+    color: #333;
+}
+
+/* Map Section */
+.map-section {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.map-container {
+    width: 100%;
+    height: auto;
+    min-height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.map-container svg {
+    width: 100%;
+    height: auto;
+    /* max-height sınırını kaldırdık ki harita container kadar büyüyebilsin */
+}
+
+/* Map Interactivity */
+.map-container svg path {
+    fill: #ffb347; /* Daha açık turuncu */
+    stroke: #ffffff;
+    stroke-width: 1.5px;
+    transition: fill 0.3s ease, transform 0.2s ease, filter 0.2s ease;
+    cursor: pointer;
+}
+
+.map-container svg g[data-plate] path:hover {
+    fill: #ff9800 !important;
+    filter: drop-shadow(0px 0px 4px rgba(0,0,0,0.3));
+}
+
+.map-container svg g.inactive path {
+    fill: #e0e0e0 !important;
+    pointer-events: none;
+}
+
+/* Province text styling inside SVG */
+.map-province-label {
+    fill: #222;
+    font-size: 18px; /* 11px'den 18px'e büyütüldü */
+    font-weight: 800;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0px 3px 5px rgba(0,0,0,0.2); /* Daha belirgin beyaz kontür */
+}
+
+.map-supplier-count {
+    fill: #c65300; /* Okunabilirliği artırmak için biraz daha koyu bir turuncu/kahve tonu */
+    font-size: 15px; /* 10px'den 15px'e büyütüldü */
+    font-weight: 900;
+}
+
+/* Province Labels */
+.map-labels {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+}
+
+.province-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #333;
+    text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.province-label.hidden {
+    opacity: 0;
+}
+
+.province-label .count {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #f57f30;
+}
+
+/* Table Section */
+.table-section {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    display: none; /* Hidden until province is selected */
+    animation: fadeIn 0.4s ease;
+}
+
+.table-section.active {
+    display: block;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.table-header h2 {
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.table-header .province-badge {
+    background-color: #fdf2ea;
+    color: #f57f30;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.suppliers-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.suppliers-table th, .suppliers-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.suppliers-table th {
+    background-color: #f9f9f9;
+    color: #666;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.suppliers-table tr:last-child td {
+    border-bottom: none;
+}
+
+.suppliers-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.suppliers-table tbody tr:hover {
+    background-color: #fcfcfc;
+}
+
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: #f57f30;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading State */
+.loading-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    gap: 1rem;
+    color: #f57f30;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.spinner {
+    font-size: 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Tooltip */
+.map-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 1000;
+    transform: translate(-50%, -100%);
+    margin-top: -10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.map-tooltip.visible {
+    opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filters-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .map-container {
+        max-height: 40vh;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(0);
+    transition: transform 0.3s;
+}
+.modal-overlay.hidden .modal-content {
+    transform: translateY(20px);
+}
+.modal-header {
+    background: #fdfdfd;
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.modal-header h3 {
+    color: #f57f30;
+    font-size: 1.25rem;
+}
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+.close-btn:hover {
+    color: #333;
+}
+.modal-body {
+    padding: 1.5rem;
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.6;
+}
+.modal-body p {
+    margin-bottom: 0.75rem;
+}
+.modal-body strong {
+    color: #222;
+}
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+}
+.modal-ok-btn {
+    background: #f57f30;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.modal-ok-btn:hover {
+    background: #e66b1f;
+}
+
+/* Info Icon */
+.info-icon {
+    color: #29b6f6;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
+}
+.info-icon:hover {
+    color: #0288d1;
+    transform: scale(1.1);
+}

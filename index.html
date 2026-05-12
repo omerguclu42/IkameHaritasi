@@ -21,10 +21,7 @@
             <div class="app-title-container">
                 <h1 class="app-title">İkame Haritası</h1>
                 <!-- Small Turkey Map Icon (SVG) -->
-                <svg class="turkey-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
-                    <path fill="#f26522" d="M10.5,23.5 C15.2,20.1 20.3,18.4 28.1,19.2 C35.4,19.9 45.6,15.3 52.8,17.1 C60.1,18.9 66.5,23.1 73.8,22.4 C81.1,21.7 87.4,26.5 90.2,30.1 C93.1,33.8 89.4,38.2 84.1,39.5 C78.8,40.8 70.2,43.1 63.5,41.2 C56.8,39.3 48.5,42.5 41.2,41.8 C33.9,41.1 24.3,44.2 18.1,40.5 C11.9,36.8 5.8,26.9 10.5,23.5 Z"/>
-                    <!-- Simplified representation of Turkey map -->
-                </svg>
+                <img src="./turkey-map.svg" alt="Türkiye Haritası" class="turkey-icon">
             </div>
 
             <form id="loginForm" class="login-form">
@@ -47,13 +44,17 @@
                 <button type="submit" class="login-button">
                     Giriş Yap <i class="fa-solid fa-arrow-right"></i>
                 </button>
+                <div id="errorMessage" class="error-message"></div>
             </form>
-
-            <div class="help-link">
-                <a href="#">Yardıma mı ihtiyacınız var?</a>
-            </div>
         </div>
     </div>
+
+    <!-- 5 seconds Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <img src="./Car.gif" class="car-gif" alt="Araç Yükleniyor...">
+        <div class="loading-text">Giriş Başarılı! Yönlendiriliyorsunuz...</div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
