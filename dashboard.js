@@ -353,9 +353,18 @@ function showSupplierInfo(supplierName) {
     const normName = normalizeString(supplierName);
     const details = supplierDetails[normName];
 
+    // Hizmet verdiği il sayısını hesapla
+    let provinceCount = 0;
+    Object.values(provinceData).forEach(prov => {
+        if (prov.suppliers.includes(supplierName)) {
+            provinceCount++;
+        }
+    });
+
     if (details) {
         modalBody.innerHTML = `
             <p><strong>Tedarikçi Adı:</strong> ${details.name}</p>
+            <p><strong>Hizmet Verdiği İl Sayısı:</strong> ${provinceCount} Adet</p>
             <p><strong>Telefon No:</strong> ${details.phone}</p>
             <p><strong>Mail:</strong> ${details.mail}</p>
             <p><strong>İl:</strong> ${details.city}</p>
@@ -367,6 +376,9 @@ function showSupplierInfo(supplierName) {
             <p style="text-align: center; color: #666; font-style: italic;">
                 Tedarikçi bilgileri henüz sisteme eklenmemiştir.<br>
                 En kısa sürede süreci tamamlıyor olacağız.
+            </p>
+            <p style="text-align: center; margin-top: 15px; font-size: 1.1rem;">
+                <strong>Hizmet Verdiği İl Sayısı:</strong> ${provinceCount} Adet
             </p>
         `;
     }
