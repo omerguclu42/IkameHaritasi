@@ -327,10 +327,16 @@ function renderTable(normProv) {
         const tdRank = document.createElement('td');
         tdRank.innerHTML = `<span class="rank-badge">${index + 1}</span>`;
         
+        const tdInfo = document.createElement('td');
+        // İsimdeki tek tırnak (eğer varsa) JS hatasına yol açmasın diye kaçış (escape) işlemi
+        const safeSupplier = supplier.replace(/'/g, "\\'");
+        tdInfo.innerHTML = `<i class="fa-solid fa-circle-info info-icon" onclick="showSupplierInfo('${safeSupplier}')"></i>`;
+        
         const tdSupplier = document.createElement('td');
         tdSupplier.textContent = supplier;
         
         tr.appendChild(tdRank);
+        tr.appendChild(tdInfo);
         tr.appendChild(tdSupplier);
         tbody.appendChild(tr);
     });
@@ -341,6 +347,37 @@ function renderTable(normProv) {
     tableSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+function showSupplierInfo(supplierName) {
+    const modal = document.getElementById('supplierModal');
+    const modalBody = document.getElementById('modalBody');
+    const normName = normalizeString(supplierName);
+    const details = supplierDetails[normName];
+
+    if (details) {
+        modalBody.innerHTML = `
+            <p><strong>Tedarikçi Adı:</strong> ${details.name}</p>
+            <p><strong>Telefon No:</strong> ${details.phone}</p>
+            <p><strong>Mail:</strong> ${details.mail}</p>
+            <p><strong>İl:</strong> ${details.city}</p>
+            <p><strong>İlçe:</strong> ${details.district}</p>
+            <p><strong>Adres:</strong> ${details.address}</p>
+        `;
+    } else {
+        modalBody.innerHTML = `
+            <p style="text-align: center; color: #666; font-style: italic;">
+                Tedarikçi bilgileri henüz sisteme eklenmemiştir.<br>
+                En kısa sürede süreci tamamlıyor olacağız.
+            </p>
+        `;
+    }
+
+    modal.classList.remove('hidden');
+}
+
+function closeSupplierInfo() {
+    document.getElementById('supplierModal').classList.add('hidden');
+}
+
 function resetFilters() {
     document.getElementById('supplierFilter').value = "";
     document.getElementById('provinceFilter').value = "";
@@ -349,22 +386,58 @@ function resetFilters() {
     updateMapColors();
 }
 
+// Global değişken
+let supplierDetails = {};
+const DETAILS_JSONP_URL = "https://docs.google.com/spreadsheets/d/1G25z1grZbfXOlwvSbr8kR7TiZh-egxzoiyUedx9zBVc/gviz/tq?tqx=responseHandler:handleSupplierDetailsData";
+
+window.handleSupplierDetailsData = function(response) {
+    if (response.status === "error") {
+        console.error("Detay verisi çekilemedi:", response.errors[0].message);
+        return;
+    }
+    const rows = response.table.rows;
+    rows.forEach(row => {
+        if (!row.c || !row.c[0] || !row.c[0].v) return;
+        
+        const originalName = row.c[0].v.toString().trim();
+        if (originalName.toLowerCase() === "tedarikçi adı") return; // başlık satırı
+        
+        const normName = normalizeString(originalName);
+        
+        supplierDetails[normName] = {
+            name: originalName,
+            phone: (row.c[1] && row.c[1].v) ? row.c[1].v.toString().trim() : "-",
+            mail: (row.c[2] && row.c[2].v) ? row.c[2].v.toString().trim() : "-",
+            city: (row.c[3] && row.c[3].v) ? row.c[3].v.toString().trim() : "-",
+            district: (row.c[4] && row.c[4].v) ? row.c[4].v.toString().trim() : "-",
+            address: (row.c[5] && row.c[5].v) ? row.c[5].v.toString().trim() : "-"
+        };
+    });
+};
+
 // Veri Çekme İşlemini Başlat
 document.addEventListener("DOMContentLoaded", () => {
-    // URL'ye cache buster ekleyelim
+    // Harita verisi
     const script = document.createElement('script');
     script.src = JSONP_URL + "&_=" + Date.now();
     
+    // Detay verisi
+    const scriptDetails = document.createElement('script');
+    scriptDetails.src = DETAILS_JSONP_URL + "&_=" + Date.now();
+
     // Timeout
     const tId = setTimeout(() => {
-        document.getElementById('loadingState').innerHTML = `<p style="color:red">Veri çekilemedi (Zaman Aşımı).</p>`;
+        const loadingE = document.getElementById('loadingState');
+        if(loadingE) loadingE.innerHTML = `<p style="color:red">Veri çekilemedi (Zaman Aşımı).</p>`;
     }, 10000);
 
     script.onload = () => clearTimeout(tId);
     script.onerror = () => {
         clearTimeout(tId);
-        document.getElementById('loadingState').innerHTML = `<p style="color:red">Google bağlantı hatası.</p>`;
+        const loadingE = document.getElementById('loadingState');
+        if(loadingE) loadingE.innerHTML = `<p style="color:red">Google bağlantı hatası.</p>`;
     };
     
     document.body.appendChild(script);
+    document.body.appendChild(scriptDetails);
 });
