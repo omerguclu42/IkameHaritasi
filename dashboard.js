@@ -41,8 +41,9 @@ window.handleSupplierData = function(response) {
         const normProv = normalizeString(originalProvinceName);
         
         let suppliers = [];
-        // Geri kalan sütunlar (B'den itibaren)
-        for (let i = 1; i < row.c.length; i++) {
+        // Geri kalan sütunlar (B'den J'ye kadar olanlar 1-9 indekslidir)
+        const maxCol = Math.min(10, row.c.length);
+        for (let i = 1; i < maxCol; i++) {
             if (row.c[i] && row.c[i].v) {
                 const supplierName = row.c[i].v.toString().trim();
                 // Sayısal değerleri (1, 2, 3...) tedarikçi listesinden hariç tut
@@ -53,10 +54,17 @@ window.handleSupplierData = function(response) {
             }
         }
 
+        let note = "";
+        // K kolonu (index 10) not bilgisidir
+        if (row.c.length > 10 && row.c[10] && row.c[10].v) {
+            note = row.c[10].v.toString().trim();
+        }
+
         if (suppliers.length > 0) {
             provinceData[normProv] = {
                 name: originalProvinceName,
-                suppliers: suppliers
+                suppliers: suppliers,
+                note: note
             };
         }
     });
@@ -342,6 +350,7 @@ function renderTable(normProv) {
     const tableSection = document.getElementById('tableSection');
     const tbody = document.getElementById('suppliersTableBody');
     const badge = document.getElementById('selectedProvinceBadge');
+    const warningNoteEl = document.getElementById('provinceWarningNote');
     
     tbody.innerHTML = '';
     
@@ -349,6 +358,15 @@ function renderTable(normProv) {
     if (!data) return;
 
     badge.textContent = `${data.name} İçin Sıralama`;
+
+    // Uyarı Notunu Göster/Gizle
+    if (data.note) {
+        warningNoteEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <strong>Uyarı :</strong> ${data.note}`;
+        warningNoteEl.style.display = 'flex';
+    } else {
+        warningNoteEl.style.display = 'none';
+        warningNoteEl.innerHTML = '';
+    }
 
     data.suppliers.forEach((supplier, index) => {
         const tr = document.createElement('tr');
@@ -486,4 +504,20 @@ document.addEventListener("DOMContentLoaded", () => {
     
     document.body.appendChild(script);
     document.body.appendChild(scriptDetails);
+});
+
+// ESC tuşu ile Pop-up kapatma veya Filtreleri Sıfırlama
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape" || e.keyCode === 27) {
+        const modal = document.getElementById('supplierModal');
+        
+        // Eğer modal (pop-up) açıksa sadece onu kapat
+        if (modal && !modal.classList.contains('hidden')) {
+            closeSupplierInfo();
+        } 
+        // Modal kapalıysa tüm filtreleri sıfırla
+        else {
+            resetFilters();
+        }
+    }
 });

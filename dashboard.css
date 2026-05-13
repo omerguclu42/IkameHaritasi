@@ -28,6 +28,24 @@ body {
     z-index: 100;
 }
 
+.province-warning-note {
+    color: #d32f2f;
+    font-family: 'Segoe UI Semibold', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
+    font-size: 12pt;
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    background-color: #fff4f4;
+    border-left: 5px solid #d32f2f;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.province-warning-note i {
+    font-size: 14pt;
+}
+
 .logo-container img {
     height: 40px;
     object-fit: contain;
