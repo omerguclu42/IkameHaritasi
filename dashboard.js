@@ -361,8 +361,10 @@ function renderTable(normProv) {
 
     // Uyarı Notunu Göster/Gizle
     if (data.note) {
-        warningNoteEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> <strong>Uyarı :</strong> ${data.note}`;
+        const formattedNote = data.note.replace(/\n/g, '<br>');
+        warningNoteEl.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="margin-top: 3px;"></i> <div><strong>Uyarı :</strong> ${formattedNote}</div>`;
         warningNoteEl.style.display = 'flex';
+        warningNoteEl.style.alignItems = 'flex-start'; // Çoklu satırlarda ikonun üstte hizalanması için
     } else {
         warningNoteEl.style.display = 'none';
         warningNoteEl.innerHTML = '';
