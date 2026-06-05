@@ -1,5 +1,5 @@
 const GOOGLE_SHEET_ID = "11dBNRMU2aRsBd6Dccg8mk661ywGxhnGhpDg2ikI9KAk";
-const JSONP_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=responseHandler:handleSupplierData`;
+const JSONP_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?headers=1&tqx=responseHandler:handleSupplierData`;
 
 // Tüm veriyi tutacağımız global değişkenler
 let provinceData = {}; // Örn: { "adana": { name: "Adana", suppliers: ["Forrent", "Araç Yedekle", ...] } }
@@ -27,6 +27,17 @@ window.handleSupplierData = function(response) {
         return;
     }
 
+    let noteIndex = -1;
+    const cols = response.table.cols;
+    if (cols) {
+        for (let i = 0; i < cols.length; i++) {
+            if (cols[i] && cols[i].label && cols[i].label.toString().trim().toLowerCase() === "not") {
+                noteIndex = i;
+                break;
+            }
+        }
+    }
+
     const rows = response.table.rows;
     
     // Verileri işle
@@ -34,33 +45,66 @@ window.handleSupplierData = function(response) {
         // Satırın A sütunu il adıdır
         if (!row.c || !row.c[0] || !row.c[0].v) return;
         
-        // Eğer başlık satırı ise atla (İller yazıyorsa)
-        if (row.c[0].v.toString().toLowerCase().includes("iller")) return;
+        const cellValue = row.c[0].v.toString().trim();
+        
+        // Eğer başlık satırı ise atla (İller yazıyorsa) ve Not kolonunu bul (başlıklar satırda da olabilir)
+        if (cellValue.toLowerCase().includes("iller")) {
+            for (let i = 1; i < row.c.length; i++) {
+                if (row.c[i] && row.c[i].v && row.c[i].v.toString().trim().toLowerCase() === "not") {
+                    noteIndex = i;
+                }
+            }
+            return;
+        }
 
-        const originalProvinceName = row.c[0].v.toString().trim();
+        const originalProvinceName = cellValue;
         const normProv = normalizeString(originalProvinceName);
         
         let suppliers = [];
-        // Geri kalan sütunlar (B'den J'ye kadar olanlar 1-9 indekslidir)
-        const maxCol = Math.min(10, row.c.length);
-        for (let i = 1; i < maxCol; i++) {
+        let note = "";
+
+        // Determine how many columns to iterate for suppliers
+        // If noteIndex is found, we only consider columns before it as suppliers.
+        // If not found, we use the row's total column length.
+        let maxSupplierCol = noteIndex !== -1 ? noteIndex : row.c.length;
+
+        for (let i = 1; i < maxSupplierCol; i++) {
+            let supplierName = "";
             if (row.c[i] && row.c[i].v) {
-                const supplierName = row.c[i].v.toString().trim();
-                // Sayısal değerleri (1, 2, 3...) tedarikçi listesinden hariç tut
-                if (supplierName && isNaN(supplierName)) {
-                    suppliers.push(supplierName);
-                    allSuppliers.add(supplierName);
-                }
+                supplierName = row.c[i].v.toString().trim();
+            }
+            
+            // Eğer veri sadece sayılardan oluşuyorsa (örneğin başlık satırından sızan bir rakamsa) atla (boş say)
+            if (supplierName !== "" && !isNaN(supplierName)) {
+                supplierName = "";
+            }
+
+            suppliers.push(supplierName);
+            
+            if (supplierName !== "") {
+                allSuppliers.add(supplierName);
             }
         }
 
-        let note = "";
-        // K kolonu (index 10) not bilgisidir
-        if (row.c.length > 10 && row.c[10] && row.c[10].v) {
-            note = row.c[10].v.toString().trim();
+        // Dizinin sonundaki gereksiz boşlukları (trailing empty slots) temizleyelim.
+        // Böylece sadece aradaki boşluklar korunur, sondaki boşluklar tabloyu uzatmaz.
+        while (suppliers.length > 0 && suppliers[suppliers.length - 1] === "") {
+            suppliers.pop();
         }
 
-        if (suppliers.length > 0) {
+        // Not kolonu verisini çek
+        if (noteIndex !== -1 && row.c[noteIndex] && row.c[noteIndex].v) {
+            note = row.c[noteIndex].v.toString().trim();
+        } else if (noteIndex === -1 && row.c.length > 10 && row.c[10] && row.c[10].v) {
+            // Eğer dinamik not bulamadıysa, geriye dönük uyumluluk için 10. kolonu (K) not kabul edelim
+            note = row.c[10].v.toString().trim();
+            if (suppliers.length > 9) {
+                suppliers[9] = ""; // 10. sütun (index 9) not'a gitti, tedarikçi değil
+            }
+        }
+
+        // Eğer tüm tedarikçiler boşsa ve not da yoksa listeye almamıza gerek yok
+        if (suppliers.some(s => s !== "") || note !== "") {
             provinceData[normProv] = {
                 name: originalProvinceName,
                 suppliers: suppliers,
@@ -377,12 +421,18 @@ function renderTable(normProv) {
         tdRank.innerHTML = `<span class="rank-badge">${index + 1}</span>`;
         
         const tdInfo = document.createElement('td');
-        // İsimdeki tek tırnak (eğer varsa) JS hatasına yol açmasın diye kaçış (escape) işlemi
-        const safeSupplier = supplier.replace(/'/g, "\\'");
-        tdInfo.innerHTML = `<i class="fa-solid fa-circle-info info-icon" onclick="showSupplierInfo('${safeSupplier}')"></i>`;
-        
         const tdSupplier = document.createElement('td');
-        tdSupplier.textContent = supplier;
+        
+        if (supplier && supplier.trim() !== "") {
+            // İsimdeki tek tırnak (eğer varsa) JS hatasına yol açmasın diye kaçış (escape) işlemi
+            const safeSupplier = supplier.replace(/'/g, "\\'");
+            tdInfo.innerHTML = `<i class="fa-solid fa-circle-info info-icon" onclick="showSupplierInfo('${safeSupplier}')"></i>`;
+            tdSupplier.textContent = supplier;
+        } else {
+            tdInfo.innerHTML = ``;
+            tdSupplier.textContent = "-";
+            tdSupplier.style.color = "#ccc";
+        }
         
         tr.appendChild(tdRank);
         tr.appendChild(tdInfo);
