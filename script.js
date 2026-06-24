@@ -29,6 +29,7 @@ window.handleGoogleSheetData = function(response) {
         }
         
         if (isAuthenticated) {
+            localStorage.setItem("loggedInUser", currentUsernameInput);
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.remove('hidden');
             

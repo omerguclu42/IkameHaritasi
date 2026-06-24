@@ -1,4 +1,12 @@
-const GOOGLE_SHEET_ID = "11dBNRMU2aRsBd6Dccg8mk661ywGxhnGhpDg2ikI9KAk";
+const ECTR_SHEET_ID = "11dBNRMU2aRsBd6Dccg8mk661ywGxhnGhpDg2ikI9KAk";
+const ADAC_SHEET_ID = "1VzlryNOImxRP_t5jO9d93zDUZuIRByqwfTXpuY9S9ck";
+
+let GOOGLE_SHEET_ID = ECTR_SHEET_ID;
+const loggedInUser = localStorage.getItem("loggedInUser");
+if (loggedInUser === "adac") {
+    GOOGLE_SHEET_ID = ADAC_SHEET_ID;
+}
+
 const JSONP_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?headers=1&tqx=responseHandler:handleSupplierData`;
 
 // Tüm veriyi tutacağımız global değişkenler
